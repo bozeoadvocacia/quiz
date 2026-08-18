@@ -73,9 +73,6 @@ body { display:flex; align-items:center; justify-content:center; }
 .btn-start { padding:16px 56px; border:none; border-radius:12px; background:var(--accent); color:var(--primary); font-size:1.2rem; font-weight:800; cursor:pointer; box-shadow:0 6px 20px rgba(201,168,76,.25); transition:all .2s; font-family:inherit; letter-spacing:.5px; }
 .btn-start:hover { background:var(--accent-light); transform:translateY(-1px); }
 .btn-start:disabled { opacity:.3; cursor:not-allowed; transform:none; }
-.btn-export { padding:10px 24px; border:none; border-radius:8px; background:var(--card); color:var(--text-muted); font-size:.85rem; font-weight:600; cursor:pointer; border:1px solid var(--border); transition:all .2s; margin-top:12px; font-family:inherit; }
-.btn-export:hover { background:var(--accent); color:var(--primary); border-color:var(--accent); }
-.btn-export:disabled { opacity:.3; cursor:not-allowed; }
 
 .conn-status { font-size:.85rem; color:var(--text-muted); margin-bottom:16px; font-weight:500; }
 .status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; }
@@ -179,7 +176,6 @@ body { display:flex; align-items:center; justify-content:center; }
     <div class="players-list" id="players-list"></div>
   </div>
   <button class="btn-start" id="btn-start" disabled>Iniciar Quizz</button>
-  <button class="btn-export" id="btn-export" disabled>Exportar Cadastros (CSV)</button>
 </div>
 
 <!-- COUNTDOWN -->
@@ -221,7 +217,6 @@ body { display:flex; align-items:center; justify-content:center; }
   <div class="final-subtitle">Quizz Mercado Imobiliário</div>
   <div class="podium" id="podium"></div>
   <div class="final-full-lb" id="final-full-lb"></div>
-  <button class="btn-export" id="btn-export-final" style="margin-top:24px" onclick="exportCSV()">Exportar Cadastros (CSV)</button>
 </div>
 
 <script>
@@ -282,6 +277,7 @@ function initCategoryChips() {
 }
 
 function updateBankInfo() {
+  if (typeof ALL_QUESTIONS === 'undefined') return;
   let pool = ALL_QUESTIONS;
   if (selectedCategories.length > 0) {
     pool = ALL_QUESTIONS.filter(q => selectedCategories.includes(q.category));
@@ -292,7 +288,10 @@ function updateBankInfo() {
 }
 
 document.getElementById('num-questions').addEventListener('change', updateBankInfo);
-initCategoryChips();
+try { initCategoryChips(); } catch(e) {
+  console.error('Erro ao carregar categorias:', e);
+  document.getElementById('bank-info').textContent = '⚠ Erro: questions.js não carregou. Verifique se o arquivo está no repositório.';
+}
 const shapes = ['▲','◆','●','■'];
 const medals = ['🥇','🥈','🥉'];
 
@@ -352,7 +351,6 @@ function handlePlayerMessage(conn, msg) {
       players.set(conn.peer, { conn, name: msg.name, score: 0, streak: 0, answers: [] });
       if (msg.registration) {
         registrations.push({ ...msg.registration, joinedAt: new Date().toLocaleString('pt-BR') });
-        document.getElementById('btn-export').disabled = false;
       }
       conn.send({ type:'joined', name: msg.name });
       updatePlayerList();
@@ -408,6 +406,10 @@ function showScreen(id) {
 }
 
 document.getElementById('btn-start').addEventListener('click', () => {
+  if (typeof pickQuestions === 'undefined') {
+    alert('Erro: banco de perguntas não carregou. Verifique se questions.js está no repositório.');
+    return;
+  }
   const numQ = parseInt(document.getElementById('num-questions').value) || 20;
   TIMER_DURATION = parseInt(document.getElementById('timer-duration').value) || 20;
   questions = pickQuestions(numQ, selectedCategories);
@@ -497,22 +499,6 @@ function finishGame() {
 // ═══════════════════════════════════════════
 //  EXPORT CSV
 // ═══════════════════════════════════════════
-function exportCSV() {
-  if (registrations.length === 0) return;
-  const headers = ['Nome','Telefone','E-mail','Empresa','Tem Advogado?','Horário de Entrada'];
-  const rows = registrations.map(r => [r.name, r.phone, r.email, r.company, r.hasLawyer, r.joinedAt].map(v => `"${(v||'').replace(/"/g,'""')}"`).join(','));
-  const csv = '﻿' + [headers.join(','), ...rows].join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `cadastros_quizz_bozeo_${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-document.getElementById('btn-export').addEventListener('click', exportCSV);
-
 initPeer();
 </script>
 </body>
