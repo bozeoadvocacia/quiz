@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quizz — Bózeo Advocacia</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="questions.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -157,7 +156,7 @@ body { display:flex; align-items:center; justify-content:center; }
     </div>
     <div class="qr-info">
       <div class="qr-label">Escaneie para jogar</div>
-      <div class="qr-box" id="qr-code"></div>
+      <div class="qr-box"><img id="qr-code" width="180" height="180" alt="QR Code"></div>
       <div class="qr-scan-msg">Aponte a câmera do celular</div>
     </div>
   </div>
@@ -317,9 +316,7 @@ function initPeer() {
     const playerUrl = base + 'index.html';
     document.getElementById('game-url').textContent = playerUrl;
     document.getElementById('conn-status').innerHTML = '<span class="status-dot ready"></span>Pronto para receber participantes';
-    const qrEl = document.getElementById('qr-code');
-    qrEl.innerHTML = '';
-    new QRCode(qrEl, { text: playerUrl, width: 180, height: 180, colorDark: '#0d1b2a', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+    document.getElementById('qr-code').src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=0d1b2a&data=' + encodeURIComponent(playerUrl);
   });
 
   peer.on('connection', (conn) => {
