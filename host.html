@@ -47,7 +47,6 @@ body { display:flex; align-items:center; justify-content:center; }
 .code-display { background:var(--card); border-radius:16px; padding:24px 48px; text-align:center; border:1px solid var(--border); box-shadow:var(--shadow); }
 .code-label { color:var(--text-muted); font-size:.8rem; margin-bottom:8px; text-transform:uppercase; letter-spacing:2px; font-weight:600; }
 .code-value { font-size:4.5rem; font-weight:900; letter-spacing:10px; color:var(--accent); }
-.code-url { color:var(--text-muted); font-size:.85rem; margin-top:10px; word-break:break-all; }
 .qr-info { text-align:center; }
 .qr-label { color:var(--text-muted); font-size:.8rem; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; font-weight:600; }
 .qr-box { background:#fff; padding:10px; border-radius:12px; display:inline-flex; box-shadow:var(--shadow); }
@@ -149,7 +148,6 @@ body { display:flex; align-items:center; justify-content:center; }
     <div class="code-display">
       <div class="code-label">Código do Jogo</div>
       <div class="code-value" id="game-code">------</div>
-      <div class="code-url" id="game-url"></div>
     </div>
     <div class="qr-info">
       <div class="qr-label">Escaneie para jogar</div>
@@ -318,7 +316,6 @@ function initPeer() {
     document.getElementById('game-code').textContent = gameCode;
     const base = location.href.replace(/\/[^\/]*$/, '/');
     const playerUrl = base + 'index.html';
-    document.getElementById('game-url').textContent = playerUrl;
     document.getElementById('conn-status').innerHTML = '<span class="status-dot ready"></span>Pronto para receber participantes';
     document.getElementById('qr-code').src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=0d1b2a&data=' + encodeURIComponent(playerUrl);
   });
