@@ -137,6 +137,10 @@ body { display:flex; align-items:center; justify-content:center; }
       <input type="text" id="reg-name" placeholder="Seu nome" maxlength="40" autocomplete="name">
     </div>
     <div class="field">
+      <label>Apelido *</label>
+      <input type="text" id="reg-nickname" placeholder="Como quer ser chamado no quiz" maxlength="20" autocomplete="off">
+    </div>
+    <div class="field">
       <label>Telefone *</label>
       <input type="tel" id="reg-phone" placeholder="(00) 00000-0000" maxlength="15" inputmode="tel" autocomplete="tel">
     </div>
@@ -239,7 +243,8 @@ body { display:flex; align-items:center; justify-content:center; }
 
 <script>
 // ═══ GOOGLE SHEETS — Cole aqui a URL do seu Apps Script ═══
-const GOOGLE_SHEETS_URL = ''; // https://script.google.com/macros/s/AKfycbxhIBaxMC5reogE9XHG_eiVWGMXQ6np81psPGE6F39m1W0TL2fIWMq8tVOSixmPHr8/exec
+const GOOGLE_SHEETS_URL = ''; // ← COLE A URL AQUI (ex: https://script.google.com/macros/s/AKfycb.../exec)
+
 let peer = null;
 let conn = null;
 let gameCode = '';
@@ -260,7 +265,7 @@ function sendToGoogleSheets(data) {
     fetch(GOOGLE_SHEETS_URL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify(data)
     }).catch(() => {}); // falha silenciosa — não atrapalha o jogo
   } catch(e) {}
@@ -375,7 +380,7 @@ document.getElementById('reg-phone').addEventListener('input', function(e) {
 // ─── STEP 1: REGISTRATION ───
 document.getElementById('btn-register').addEventListener('click', doRegister);
 
-['reg-name','reg-phone','reg-email','reg-company'].forEach((id, i, arr) => {
+['reg-name','reg-nickname','reg-phone','reg-email','reg-company'].forEach((id, i, arr) => {
   document.getElementById(id).addEventListener('keyup', e => {
     if (e.key === 'Enter') {
       if (i < arr.length - 1) document.getElementById(arr[i+1]).focus();
@@ -386,6 +391,7 @@ document.getElementById('btn-register').addEventListener('click', doRegister);
 
 function doRegister() {
   const name = document.getElementById('reg-name').value.trim();
+  const nickname = document.getElementById('reg-nickname').value.trim();
   const phone = document.getElementById('reg-phone').value.trim();
   const email = document.getElementById('reg-email').value.trim();
   const company = document.getElementById('reg-company').value.trim();
@@ -394,15 +400,16 @@ function doRegister() {
   errEl.textContent = '';
 
   if (!name) { errEl.textContent = 'Preencha seu nome.'; return; }
+  if (!nickname) { errEl.textContent = 'Preencha seu apelido.'; return; }
   if (!phone || phone.replace(/\D/g,'').length < 10) { errEl.textContent = 'Digite um telefone válido.'; return; }
   if (!email || !email.includes('@') || !email.includes('.')) { errEl.textContent = 'Digite um e-mail válido.'; return; }
   if (!company) { errEl.textContent = 'Informe sua empresa.'; return; }
   if (!lawyerEl) { errEl.textContent = 'Responda se tem advogado.'; return; }
 
-  playerName = name.length > 20 ? name.slice(0, 20) : name;
-  playerData = { name, phone, email, company, hasLawyer: lawyerEl.value };
+  playerName = nickname.length > 20 ? nickname.slice(0, 20) : nickname;
+  playerData = { name, nickname, phone, email, company, hasLawyer: lawyerEl.value };
 
-  document.getElementById('join-display-name').textContent = name.split(' ')[0] + '!';
+  document.getElementById('join-display-name').textContent = nickname + '!';
   showScreen('join-screen');
   document.getElementById('code-input').focus();
 }
