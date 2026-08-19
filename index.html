@@ -113,8 +113,10 @@ body { display:flex; align-items:center; justify-content:center; }
 .final-lb-item .lb-rank { width:28px; } .final-lb-item .lb-name { flex:1; } .final-lb-item .lb-score { color:var(--accent); }
 
 /* DISCONNECTED */
-.dc-banner { position:fixed; top:0; left:0; right:0; background:var(--red); color:#fff; text-align:center; padding:10px; font-weight:700; font-size:.85rem; z-index:999; display:none; }
-.dc-banner.show { display:block; }
+.dc-banner { position:fixed; top:0; left:0; right:0; background:var(--red); color:#fff; text-align:center; padding:12px; font-weight:700; font-size:.85rem; z-index:999; display:none; }
+.dc-banner.show { display:block; animation:bannerPulse 2s infinite; }
+@keyframes bannerPulse { 0%,100%{opacity:1} 50%{opacity:.7} }
+.dc-banner.reconnected { background:var(--green); animation:none; }
 </style>
 </head>
 <body>
@@ -236,18 +238,130 @@ body { display:flex; align-items:center; justify-content:center; }
 </div>
 
 <script>
+// ═══ GOOGLE SHEETS — Cole aqui a URL do seu Apps Script ═══
+const GOOGLE_SHEETS_URL = ''; // https://script.google.com/macros/s/AKfycbyZQdYIquyvvHPouX9-yo3p1x3ljH_ncrubFoBmQfy8bt4iBf36CQ6Lzl_PudfXxa3f/exec
+
 let peer = null;
 let conn = null;
 let gameCode = '';
 let playerName = '';
 let playerData = {};
 let timerInterval = null;
+let heartbeatInterval = null;
+let reconnectAttempts = 0;
+const MAX_RECONNECT = 10;
 const shapes = ['▲','◆','●','■'];
+let currentScreen = 'register-screen';
+let lastHostMessage = null;
+
+// ─── ENVIAR CADASTRO AO GOOGLE SHEETS ───
+function sendToGoogleSheets(data) {
+  if (!GOOGLE_SHEETS_URL) return; // URL não configurada — ignora silenciosamente
+  try {
+    fetch(GOOGLE_SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).catch(() => {}); // falha silenciosa — não atrapalha o jogo
+  } catch(e) {}
+}
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  currentScreen = id;
 }
+
+// ─── HEARTBEAT ───
+function startHeartbeat() {
+  clearInterval(heartbeatInterval);
+  heartbeatInterval = setInterval(() => {
+    if (conn && conn.open) {
+      try { conn.send({ type: 'ping' }); } catch(e) { handleDisconnect(); }
+    } else {
+      handleDisconnect();
+    }
+  }, 5000);
+}
+
+// ─── RECONNECTION ───
+function handleDisconnect() {
+  clearInterval(heartbeatInterval);
+  if (reconnectAttempts >= MAX_RECONNECT || !gameCode) {
+    document.getElementById('dc-banner').textContent = 'Conexão perdida. Recarregue a página e entre novamente.';
+    document.getElementById('dc-banner').classList.add('show');
+    return;
+  }
+  document.getElementById('dc-banner').classList.add('show');
+  document.getElementById('dc-banner').textContent = `Reconectando... (${reconnectAttempts + 1}/${MAX_RECONNECT})`;
+  reconnectAttempts++;
+  const delay = Math.min(1000 * Math.pow(1.5, reconnectAttempts - 1), 8000);
+  setTimeout(() => attemptReconnect(), delay);
+}
+
+function attemptReconnect() {
+  if (conn && conn.open) { reconnectAttempts = 0; document.getElementById('dc-banner').classList.remove('show'); return; }
+  try { if (peer) peer.destroy(); } catch(e) {}
+
+  peer = new Peer(undefined, {
+    config: { iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' },
+      { urls: 'stun:stun3.l.google.com:19302' },
+      { urls: 'stun:stun4.l.google.com:19302' }
+    ]}
+  });
+
+  peer.on('open', () => {
+    const hostPeerId = 'quizimob-' + gameCode;
+    conn = peer.connect(hostPeerId, { reliable: true, serialization: 'json' });
+
+    const timeout = setTimeout(() => { handleDisconnect(); }, 8000);
+
+    conn.on('open', () => {
+      clearTimeout(timeout);
+      reconnectAttempts = 0;
+      const banner = document.getElementById('dc-banner');
+      banner.textContent = 'Reconectado!';
+      banner.classList.add('reconnected');
+      setTimeout(() => { banner.classList.remove('show', 'reconnected'); }, 2000);
+      conn.send({ type: 'rejoin', name: playerName, registration: playerData });
+      startHeartbeat();
+    });
+
+    conn.on('data', (msg) => handleHostMessage(msg, null, null));
+    conn.on('close', () => handleDisconnect());
+    conn.on('error', () => { clearTimeout(timeout); handleDisconnect(); });
+  });
+
+  peer.on('error', () => handleDisconnect());
+}
+
+// ─── MOBILE VISIBILITY ───
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && gameCode && conn) {
+    if (!conn.open) { handleDisconnect(); }
+    else { try { conn.send({ type: 'ping' }); } catch(e) { handleDisconnect(); } }
+  }
+});
+
+// Prevent sleep on mobile during game
+let wakeLock = null;
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    }
+  } catch(e) {}
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && currentScreen !== 'register-screen' && currentScreen !== 'join-screen') {
+    requestWakeLock();
+  }
+});
 
 // ─── PHONE MASK ───
 document.getElementById('reg-phone').addEventListener('input', function(e) {
@@ -313,30 +427,34 @@ function joinGame() {
   peer = new Peer(undefined, {
     config: { iceServers: [
       { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'stun:stun1.l.google.com:19302' }
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' },
+      { urls: 'stun:stun3.l.google.com:19302' },
+      { urls: 'stun:stun4.l.google.com:19302' }
     ]}
   });
 
   peer.on('open', () => {
     const hostPeerId = 'quizimob-' + code;
-    conn = peer.connect(hostPeerId, { reliable: true });
+    conn = peer.connect(hostPeerId, { reliable: true, serialization: 'json' });
 
     const timeout = setTimeout(() => {
       errEl.textContent = 'Não foi possível conectar. Verifique o código.';
       btn.disabled = false; btn.textContent = 'Entrar no Quizz';
       try { conn.close(); } catch(e) {}
-    }, 10000);
+    }, 12000);
 
     conn.on('open', () => {
       clearTimeout(timeout);
+      reconnectAttempts = 0;
       conn.send({ type: 'join', name: playerName, registration: playerData });
+      startHeartbeat();
+      requestWakeLock();
     });
 
     conn.on('data', (msg) => handleHostMessage(msg, errEl, btn));
 
-    conn.on('close', () => {
-      document.getElementById('dc-banner').classList.add('show');
-    });
+    conn.on('close', () => handleDisconnect());
 
     conn.on('error', () => {
       clearTimeout(timeout);
@@ -354,6 +472,8 @@ function joinGame() {
 
 // ─── MESSAGE HANDLING ───
 function handleHostMessage(msg, errEl, btn) {
+  if (msg.type === 'pong') return; // heartbeat response
+  lastHostMessage = msg;
   switch(msg.type) {
     case 'error':
       if (errEl) errEl.textContent = msg.message;
@@ -363,6 +483,8 @@ function handleHostMessage(msg, errEl, btn) {
     case 'joined':
       document.getElementById('lobby-name').textContent = msg.name;
       showScreen('lobby-screen');
+      // Enviar cadastro ao Google Sheets
+      sendToGoogleSheets({ ...playerData, gameCode });
       break;
 
     case 'game-starting':
