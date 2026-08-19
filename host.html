@@ -493,6 +493,16 @@ document.getElementById('btn-start').addEventListener('click', () => {
   const ci = setInterval(() => { count--; if(count<=0){clearInterval(ci);nextQuestion();return;} document.getElementById('big-countdown').textContent=count; }, 1000);
 });
 
+function shuffleOptions(q) {
+  const indices = [0, 1, 2, 3];
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  q.options = indices.map(i => q.options[i]);
+  q.correct = indices.indexOf(q.correct);
+}
+
 function nextQuestion() {
   currentQuestion++;
   if (currentQuestion >= questions.length) { finishGame(); return; }
@@ -500,6 +510,7 @@ function nextQuestion() {
   answersReceived = new Map();
   questionStartTime = Date.now();
   const q = questions[currentQuestion];
+  shuffleOptions(q);
   broadcast({ type:'new-question', index:currentQuestion, total:questions.length, question:q.question, options:q.options, duration:TIMER_DURATION, category:q.category });
   showScreen('question-screen');
   document.getElementById('q-progress').textContent = `Pergunta ${currentQuestion+1} de ${questions.length}`;
