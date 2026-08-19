@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  BANCO DE PERGUNTAS — QUIZ IMOBILIÁRIO
-//  1000+ perguntas em 7 categorias
+//  1000+ perguntas em 6 categorias
 // ═══════════════════════════════════════════════════════════════
 
 const ALL_QUESTIONS = [
@@ -205,9 +205,6 @@ const ALL_QUESTIONS = [
 // ╔═══════════════════════════════════════════════════════════════╗
 // ║  PERGUNTAS BÓZEO ADVOCACIA (Bônus/Institucional)             ║
 // ╚═══════════════════════════════════════════════════════════════╝
-
-{category:"Bózeo Advocacia",question:"Dentro da estratégia de gestão da Bózeo Advocacia, o que contempla o '1º Passo' para a Gestão da Segurança?",options:["Análise de todos os contratos, elaboração de padrões e verificação tributária da imobiliária","Realização de workshops semanais com todos os corretores","Ajuizamento imediato de ações de despejo para inadimplentes","Execução de títulos extrajudiciais acima de 40 salários mínimos"],correct:0,explanation:"O 1º Passo do onboarding da Bózeo contempla a análise de contratos, padronização documental e verificação tributária da imobiliária."},
-{category:"Bózeo Advocacia",question:"Como funciona o 'Bônus Educacional' oferecido pela Bózeo Advocacia em seus planos?",options:["Desconto em cursos de pós-graduação para sócios","Consultoria jurídica individualizada para cada cliente","Workshop a cada 6 meses com tema de escolha da imobiliária","Treinamento diário sobre novas leis"],correct:2,explanation:"O Bônus Educacional consiste em um workshop semestral com tema escolhido pela imobiliária, promovendo educação continuada."},
 
 // ╔═══════════════════════════════════════════════════════════════╗
 // ║  PERGUNTAS ADICIONAIS — completando 200+                     ║
@@ -1183,14 +1180,6 @@ const ALL_QUESTIONS = [
 {category:"Reforma Tributária",question:"A tributação de estacionamentos em imóveis comerciais será enquadrada como:",options:["Operação imobiliária com redução de 40%","Prestação de serviços pela alíquota geral de IBS e CBS","Isenta de qualquer tributo","Tributada pelo Imposto Seletivo"],correct:1,explanation:"Estacionamento é predominantemente prestação de serviço de guarda de veículos, tributada pela alíquota geral de IBS e CBS, não se enquadrando como operação imobiliária com redução de 40%."},
 {category:"Reforma Tributária",question:"O prazo constitucional de transição do ICMS para o IBS termina em:",options:["2029","2031","2033","2035"],correct:2,explanation:"A transição do ICMS para o IBS se completa em 2033, quando o ICMS será totalmente extinto e o IBS assumirá integralmente (EC 132/2023, ADCT, art. 127-128)."},
 {category:"Reforma Tributária",question:"Qual a principal consequência da adoção do 'IVA moderno' para o mercado imobiliário brasileiro?",options:["Extinção da propriedade privada de imóveis","Simplificação tributária, transparência e eliminação de cumulatividade, com potencial redução de custos no longo prazo","Aumento generalizado de todos os tributos imobiliários","Proibição de financiamento imobiliário"],correct:1,explanation:"A adoção do IVA dual (EC 132/2023) traz simplificação, transparência e não-cumulatividade plena ao setor imobiliário, potencialmente reduzindo custos tributários ocultos no médio e longo prazo."},
-
-// ═══ NOVAS QUESTÕES: BÓZEO ADVOCACIA ═══
-
-{category:"Bózeo Advocacia",question:"Qual é o principal diferencial da advocacia preventiva oferecida pela Bózeo Advocacia para o mercado imobiliário?",options:["Atuar apenas em processos judiciais após o problema ocorrer","Analisar riscos jurídicos antes da celebração de contratos e negócios, evitando litígios","Oferecer serviços exclusivamente para pessoas físicas","Focar apenas em direito penal empresarial"],correct:1,explanation:"A advocacia preventiva da Bózeo Advocacia analisa contratos, due diligence e riscos jurídicos antes da concretização do negócio, reduzindo custos com litígios e protegendo o patrimônio do cliente."},
-{category:"Bózeo Advocacia",question:"Por que a Bózeo Advocacia recomenda a padronização de contratos imobiliários nas empresas do setor?",options:["Para dificultar a leitura pelo comprador","Para garantir segurança jurídica, uniformidade nas cláusulas e redução de riscos em operações repetitivas","Para evitar a necessidade de registro em cartório","Para substituir a escritura pública"],correct:1,explanation:"A padronização contratual assegura que todas as operações da empresa sigam as mesmas cláusulas protetivas, facilitando a gestão de riscos e o compliance jurídico."},
-{category:"Bózeo Advocacia",question:"Como o planejamento tributário oferecido pela Bózeo Advocacia pode beneficiar empresas do mercado imobiliário?",options:["Eliminando todos os impostos legalmente","Escolhendo o regime tributário mais adequado e estruturando operações para reduzir a carga fiscal de forma lícita","Criando empresas offshore para sonegação","Postergando indefinidamente o pagamento de tributos"],correct:1,explanation:"O planejamento tributário lícito (elisão fiscal) analisa o melhor regime (lucro real, presumido ou RET) e estrutura as operações para otimizar a carga tributária dentro da legalidade."},
-{category:"Bózeo Advocacia",question:"Qual a importância do compliance trabalhista que a Bózeo Advocacia implementa em construtoras e incorporadoras?",options:["Apenas cumprir formalidades sem impacto real","Prevenir passivos trabalhistas, garantir conformidade com NRs e CLT, e reduzir riscos de ações judiciais","Substituir o departamento de RH da empresa","Eliminar a necessidade de registro em carteira"],correct:1,explanation:"O compliance trabalhista garante que a empresa siga as normas da CLT, NRs de segurança (especialmente NR-18 na construção civil) e boas práticas, prevenindo ações trabalhistas e multas."},
-{category:"Bózeo Advocacia",question:"De que forma a Bózeo Advocacia utiliza a transformação digital para atender o mercado imobiliário?",options:["Não utiliza tecnologia, preferindo métodos tradicionais","Utiliza ferramentas digitais para gestão de contratos, due diligence eletrônica e atendimento remoto eficiente","Substitui advogados por inteligência artificial","Oferece apenas atendimento presencial em escritório físico"],correct:1,explanation:"A Bózeo Advocacia incorpora tecnologia jurídica (lawtechs) para agilizar análises contratuais, due diligence digital, assinatura eletrônica e atendimento remoto, aumentando eficiência e acessibilidade."}
 
 ];
 
