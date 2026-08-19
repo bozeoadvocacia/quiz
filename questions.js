@@ -203,10 +203,6 @@ const ALL_QUESTIONS = [
 {category:"Reforma Tributária",question:"O que muda para o corretor de imóveis pessoa física com a Reforma Tributária?",options:["Passa a pagar IBS/CBS sobre todas as comissões","Quem exerce atividade habitual e aufere receita acima do limite pode ser contribuinte do IBS/CBS","Fica isento de todos os tributos","Deve se tornar pessoa jurídica obrigatoriamente"],correct:1,explanation:"Corretores PF que atuam com habitualidade e ultrapassam o limite de receita poderão ser contribuintes do IBS/CBS sobre suas comissões."},
 
 // ╔═══════════════════════════════════════════════════════════════╗
-// ║  PERGUNTAS BÓZEO ADVOCACIA (Bônus/Institucional)             ║
-// ╚═══════════════════════════════════════════════════════════════╝
-
-// ╔═══════════════════════════════════════════════════════════════╗
 // ║  PERGUNTAS ADICIONAIS — completando 200+                     ║
 // ╚═══════════════════════════════════════════════════════════════╝
 
